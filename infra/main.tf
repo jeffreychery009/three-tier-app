@@ -64,3 +64,37 @@ output "private_db_subnet_ids" {
     description = "IDs of the private DB subnets"
     value       = module.vpc.private_db_subnet_ids
 }
+
+
+# This section is the for launching the EC2 instance in the private app subnets
+module "ec2" {
+    source = "./modules/ec2"
+
+    # EC2 Configuration
+    ec2_name = "three-tier-app-ec2"
+    ec2_tags = {
+        Name = "three-tier-app-ec2"
+        Environment = "production"
+        Project = "three-tier-app"
+    }
+    subnet_ids = module.vpc.private_app_subnet_ids
+    vpc_id = module.vpc.vpc_id
+    allowed_cidr_blocks = [module.vpc.vpc_cidr_block]
+    ec2_count = 2
+}
+
+# Output EC2 information for use by other modules
+output "ec2_ids" {
+    description = "IDs of the EC2 instances"
+    value = module.ec2.ec2_ids
+}
+
+output "ec2_instance_types" {
+    description = "Instance types of the EC2 instances"
+    value = module.ec2.ec2_instance_types
+}
+
+output "ec2_security_group_ids" {
+    description = "IDs of the EC2 security groups"
+    value = module.ec2.ec2_security_group_ids
+}
