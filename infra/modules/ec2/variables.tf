@@ -35,3 +35,8 @@ variable "allowed_cidr_blocks" {
   description = "CIDR blocks allowed to access the instance"
   default     = ["10.0.0.0/16"]  # Allow access from your VPC
 }
+
+variable "target_group_arn" {
+  type = string
+  description = "The ARN of the target group"
+}
