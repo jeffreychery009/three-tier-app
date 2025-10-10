@@ -42,6 +42,7 @@ resource "aws_security_group" "ec2_sg" {
         from_port = 0
         to_port = 0
         protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
     }
     tags = {
         Name = "${var.ec2_name}-sg"
@@ -56,10 +57,18 @@ resource "aws_instance" "main" {
     ami = data.aws_ami.ubuntu.id
     subnet_id = var.subnet_ids[count.index]
     instance_type = var.ec2_instance_type
-    security_groups = [aws_security_group.ec2_sg.id]
+    vpc_security_group_ids = [aws_security_group.ec2_sg.id]
 
     tags = {
         Name = "${var.ec2_name}-${count.index + 1}"
         Subnet = var.subnet_ids[count.index]
     }
+}
+
+resource "aws_lb_target_group_attachment" "main" {
+    count = var.ec2_count
+    target_group_arn = var.target_group_arn
+    target_id = aws_instance.main[count.index].id
+    port = 80
+  
 }
